@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>圓的面積 × LM Studio + OpenCode 本地模型教學 | 國立清華大學數理教育研究所</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", "Helvetica Neue", Arial, sans-serif; margin: 0; background: #f0f4f8; color: #222; line-height: 1.7; }
+  header { background: linear-gradient(135deg, #0b3d62, #14507e); color: #fff; padding: 2rem 1rem; text-align: center; }
+  header .school { font-size: 0.95rem; letter-spacing: 2px; opacity: 0.9; }
+  header h1 { margin: 0.5rem 0 0; font-size: 1.7rem; line-height: 1.3; }
+  header .sub { font-size: 1rem; opacity: 0.9; margin-top: 0.5rem; }
+  nav { background: #fff; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 100; }
+  nav ul { display: flex; flex-wrap: wrap; justify-content: center; list-style: none; margin: 0; padding: 0; }
+  nav li { margin: 0; }
+  nav a { display: block; padding: 0.75rem 1.2rem; text-decoration: none; color: #0b3d62; font-weight: 600; border-bottom: 3px solid transparent; }
+  nav a:hover, nav a.active { background: #eef4fa; border-bottom-color: #0b3d62; }
+  main { max-width: 900px; margin: 0 auto; padding: 1.5rem 1rem; }
+  section { background: #fff; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: none; }
+  section.active { display: block; }
+  section h2 { color: #0b3d62; border-left: 5px solid #14507e; padding-left: 0.8rem; margin-top: 0; }
+  h3 { color: #14507e; margin-top: 1.2rem; }
+  .card { background: #f7fafc; border: 1px dashed #9fc1e0; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+  .cmd { background: #1e1e1e; color: #d4d4d4; padding: 0.75rem 1rem; border-radius: 6px; font-family: "Courier New", monospace; font-size: 0.9rem; position: relative; overflow-x: auto; margin: 0.6rem 0; }
+  .copy-btn { position: absolute; top: 0.5rem; right: 0.5rem; background: #0b3d62; color: #fff; border: none; border-radius: 4px; padding: 0.25rem 0.6rem; font-size: 0.8rem; cursor: pointer; }
+  .copy-btn:hover { background: #14507e; }
+  .copy-btn.copied { background: #2e7d32; }
+  .btn { background: #14507e; color: #fff; border: none; border-radius: 6px; padding: 0.6rem 1.4rem; cursor: pointer; font-size: 1rem; font-family: inherit; }
+  .btn:hover { background: #0b3d62; }
+  .btn.secondary { background: #6c757d; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+  .model-card { border: 1px solid #d0e0f0; border-radius: 8px; padding: 1rem; text-align: center; background: #fbfdff; }
+  .model-card.left { text-align: left; }
+  .formula { font-size: 1.5rem; font-weight: bold; color: #c0392b; text-align: center; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; padding: 0.75rem; border-radius: 4px; margin: 1rem 0; font-size: 0.95rem; }
+  footer { text-align: center; padding: 1.5rem; color: #666; font-size: 0.9rem; border-top: 1px solid #ddd; margin-top: 1rem; }
+  svg.image { max-width: 100%; height: auto; display: block; margin: 1rem auto; }
+  .center { text-align: center; }
+  .kids { font-size: 1.05rem; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+  th, td { border: 1px solid #ddd; padding: 0.6rem; text-align: left; }
+  th { background: #eef4fa; }
+  code { background: #eef4fa; padding: 0 0.2rem; border-radius: 3px; font-family: "Courier New", monospace; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="school">🏛️ 國立清華大學數理教育研究所</div>
+  <h1>圓的面積 × LM Studio + OpenCode 本地模型教學</h1>
+  <div class="sub">國小學生友善版 · 單一 HTML 檔 · 圖片全部內嵌 · 離線也能顯示 · 無外部圖片網址</div>
+</header>
+
+<nav>
+  <ul>
+    <li><a href="#home" onclick="show('home', this)" class="active">🏠 首頁</a></li>
+    <li><a href="#circle" onclick="show('circle', this)">📐 第一單元：圓的面積</a></li>
+    <li><a href="#install" onclick="show('install', this)">💻 第二單元：安裝 LM Studio 與 OpenCode</a></li>
+    <li><a href="#gemma" onclick="show('gemma', this)">🤖 第三單元：Gemma 4 26B 解題</a></li>
+    <li><a href="#qwen" onclick="show('qwen', this)">🤖 第四單元：Qwen 3 解題</a></li>
+    <li><a href="#builtin" onclick="show('builtin', this)">🆓 第五單元：OpenCode 內建免費模型</a></li>
+    <li><a href="#prompt" onclick="show('prompt', this)">📝 第六單元：教材製作 Prompt 揭秘</a></li>
+  </ul>
+</nav>
+
+<main>
+
+  <!-- ========== HOME ========== -->
+  <section id="home" class="active">
+    <h2>歡迎！👋</h2>
+    <p class="kids">這個教材有兩個目的：</p>
+    <ul class="kids">
+      <li>教你怎麼算「圓的面積」</li>
+      <li>教你在自己電腦上用「本地模型（Local Model）」跑 AI，斷網也能用</li>
+    </ul>
+    <div class="grid center">
+      <div class="model-card">
+        <h3>📐 第一單元</h3>
+        <p>學習圓的面積公式 A = πr²，適合國小學生。</p>
+      </div>
+      <div class="model-card">
+        <h3>💻 第二單元</h3>
+        <p>安裝 LM Studio 與 OpenCode，把 AI 模型裝進自己電腦。</p>
+      </div>
+      <div class="model-card">
+        <h3>🤖 第三、四單元</h3>
+        <p>用 Gemma 4 26B 與 Qwen 3 來幫你解圓面積題目。</p>
+      </div>
+    </div>
+    <div class="note"><strong>🔒 離線說明：</strong> 本檔案所有圖片都直接寫在 HTML 裡面，沒有任何外部圖片網址，把檔案複製到沒有網路的電腦也能正常開啟。</div>
+    <div class="center" style="margin-top:1.5rem;">
+      <button class="btn" onclick="show('circle', null)">開始學習圓面積 ▶</button>
+    </div>
+  </section>
+
+  <!-- ========== CIRCLE ========== -->
+  <section id="circle">
+    <h2>📐 第一單元：圓的面積是什麼？</h2>
+    <p class="kids">圓是一種圓滾滾的圖形。圓心到圓邊緣的距離，叫做「半徑」，符號是 <strong>r</strong>。</p>
+    <svg class="image" viewBox="0 0 420 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="圓與半徑示意圖">
+      <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="7" refX="6" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#14507e"/>
+        </marker>
+      </defs>
+      <circle cx="210" cy="160" r="100" fill="#e3f2fd" stroke="#14507e" stroke-width="4"/>
+      <line x1="210" y1="160" x2="310" y2="160" stroke="#c0392b" stroke-width="3" marker-end="url(#arrow)"/>
+      <line x1="210" y1="160" x2="210" y2="260" stroke="#c0392b" stroke-width="3" marker-end="url(#arrow)"/>
+      <text x="250" y="168" fill="#c0392b" font-weight="bold" font-size="17">半徑 r</text>
+      <text x="195" y="273" fill="#c0392b" font-weight="bold" font-size="17">半徑 r</text>
+      <text x="182" y="146" fill="#14507e" font-weight="bold" font-size="17">圓心 O</text>
+      <circle cx="210" cy="160" r="4" fill="#14507e"/>
+    </svg>
+    <p class="center">圓的面積公式：</p>
+    <div class="formula">A = π × r²</div>
+    <p class="center">π（派）約等於 <strong>3.14</strong></p>
+    <div class="card">
+      <strong>💡 舉例：</strong> 半徑 r = 5 公分的圓，面積是多少？<br>
+      A = 3.14 × 5 × 5 = <strong>78.5 平方公分</strong>
+    </div>
+    <div class="card center">
+      <label for="radius" style="font-weight:bold;">輸入半徑（公分）：</label>
+      <input type="number" id="radius" value="5" step="0.1" style="padding:0.4rem; font-size:1rem;">
+      <button class="btn" onclick="calcArea()" style="margin-left:0.5rem;">算面積</button>
+      <p id="areaResult" style="margin-top:0.6rem; font-weight:bold; color:#14507e; font-size:1.1rem;"></p>
+    </div>
+  </section>
+
+  <!-- ========== INSTALL ========== -->
+  <section id="install">
+    <h2>💻 第二單元：安裝 LM Studio 與 OpenCode</h2>
+    <p>我們要把 AI 模型裝進自己的電腦，這樣就不用把題目傳到雲端，比較私隱，也能斷網使用。</p>
+
+    <h3>步驟 1：下載並安裝 LM Studio</h3>
+    <div class="card">
+      LM Studio 是一個讓你在電腦上跑本地模型的軟體。<br>
+      前往 <a href="https://lmstudio.ai" target="_blank" rel="nofollow">lmstudio.ai</a> 下載（需要一次外網路下載，之後可離線使用），<br>
+      依提示安裝（Windows / Mac / Linux 皆可）。
+    </div>
+    <div class="cmd"># 下載完成後依 LM Studio 提示完成安裝</div>
+
+    <h3>步驟 2：下載模型</h3>
+    <ul>
+      <li>開啟 LM Studio →「模型庫」，搜尋並下載：<strong>Gemma 4 26B</strong> 與 <strong>Qwen 3</strong></li>
+      <li>下載完成後，點選模型右側的「載入」</li>
+    </ul>
+    <div class="note"><strong>🔑 小提醒：</strong> 模型名稱請以 LM Studio 模型庫實際可下載的版本為準；第一次下載需要網路，下載好之後就可以斷線使用囉。</div>
+
+    <h3>步驟 3：啟動本地伺服器</h3>
+    <div class="card">
+      在 LM Studio 左側選單點選「本地伺服器 (Local Server)」→「啟動伺服器」。<br>
+      預設網址是 <code>http://localhost:1234</code>
+    </div>
+
+    <h3>步驟 4：安裝 OpenCode</h3>
+    <div class="cmd">npm install -g opencode</div>
+    <div class="cmd">opencode</div>
+    <button class="copy-btn" onclick="copyCmd(this, 'npm install -g opencode')">複製指令</button>
+    <button class="copy-btn" style="margin-left:0.5rem;" onclick="copyCmd(this, 'opencode')">複製指令</button>
+
+    <h3>步驟 5：讓 OpenCode 連到 LM Studio</h3>
+    <div class="card">
+      OpenCode 可連接 LM Studio 的本地伺服器，將基礎網址設為 <code>http://localhost:1234/v1</code>，<br>
+      就可以開始與本地模型對話囉！
+    </div>
+  </section>
+
+  <!-- ========== GEMMA ========== -->
+  <section id="gemma">
+    <h2>🤖 第三單元：用 Gemma 4 26B 解圓面積題目</h2>
+    <div class="model-card left">
+      <strong>模型：</strong> Gemma 4 26B（Google 開發，在 LM Studio 裡下載即可使用）
+    </div>
+    <p>把下面的指令複製到 OpenCode，Gemma 4 26B 就會幫你解題：</p>
+    <div class="cmd">你是一位國小數學老師。請用非常簡單的中文，解釋「半徑 7 公分的圓面積是多少」，並列出計算過程，答案用平方公分。</div>
+    <button class="copy-btn" onclick="copyCmd(this, '你是一位國小數學老師。請用非常簡單的中文，解釋「半徑 7 公分的圓面積是多少」，並列出計算過程，答案用平方公分。')">複製指令</button>
+    <div class="card">
+      <strong>🤖 Gemma 4 26B 範例回答：</strong><br>
+      圓面積公式是 A = π × r²。半徑 r = 7 公分。<br>
+      A = 3.14 × 7 × 7 = 3.14 × 49 ≈ 153.86 平方公分。<br>
+      所以面積大約是 <strong>153.86 公分²</strong>。
+    </div>
+  </section>
+
+  <!-- ========== QWEN ========== -->
+  <section id="qwen">
+    <h2>🤖 第四單元：用 Qwen 3 解圓面積題目</h2>
+    <div class="model-card left">
+      <strong>模型：</strong> Qwen 3（阿里雲開發，強大的多語言模型，在 LM Studio 裡下載即可使用）
+    </div>
+    <p>把下面的指令複製到 OpenCode，Qwen 3 就會幫你解題：</p>
+    <div class="cmd">請用國小學生聽得懂的中文，說明圓的面積公式，並幫我算出半徑 10 公分的圓面積，寫出每一步。</div>
+    <button class="copy-btn" onclick="copyCmd(this, '請用國小學生聽得懂的中文，說明圓的面積公式，並幫我算出半徑 10 公分的圓面積，寫出每一步。')">複製指令</button>
+    <div class="card">
+      <strong>🤖 Qwen 3 範例回答：</strong><br>
+      圓面積 = π × 半徑 × 半徑。半徑 10 公分。<br>
+      3.14 × 10 × 10 = 314 平方公分。<br>
+      答案：<strong>314 公分²</strong>。
+    </div>
+  </section>
+
+  <!-- ========== BUILTIN ========== -->
+  <section id="builtin">
+    <h2>🆓 第五單元：OpenCode 內建的強大免費模型</h2>
+    <p>OpenCode 裡面內建支援很多模型來源，你可以切換不同的模型來比較答案。除了本地的 LM Studio，OpenCode 也能連接到免費的雲端模型端點（需要網路），非常適合新手快速試用。</p>
+    <table>
+      <tr><th>模型來源</th><th>特色</th><th>適合</th></tr>
+      <tr><td>LM Studio 本地模型</td><td>離線可用、隱私較好</td><td>Gemma 4 26B、Qwen 3 等</td></tr>
+      <tr><td>OpenAI-compatible 免費端點</td><td>設定簡單、切換快</td><td>新手快速試用</td></tr>
+    </table>
+    <div class="note"><strong>💡 提示：</strong> 在 OpenCode 裡輸入 <code>/model</code>，就可以查看並切換目前可用的模型喔！</div>
+  </section>
+
+  <!-- ========== PROMPT (教學版本) ========== -->
+  <section id="prompt">
+    <h2>📝 第六單元：這個教材怎麼做出來的？（Prompt 揭秘 / 教學版本）</h2>
+    <p>老師或家長如果想自己製作類似的「單檔 HTML」教材，可以參考下面我用來生成這個網頁的 Prompt（提示詞）：</p>
+    <div class="card">
+      <strong>🧩 製作本教材的 Prompt：</strong><br>
+      <div class="cmd">請製作一份給國小學生使用的「圓面積」教學 HTML 網頁，主題是「LM Studio 搭配 OpenCode 使用本地模型」。第一模型用 Gemma 4 26B，第二模型用 Qwen 3。要求：單一自包含 HTML 檔、圖片全部內嵌（不可引用外部圖片 URL）、離線也能顯示、內容要能讓新手從安裝一路做到跑通。可以介紹 OpenCode 裡面內建的強大免費模型。指令要增加可以直接複製的按鈕。再製作一個「教學版本」說明製作這個教材的 Prompt。首頁要顯示「國立清華大學數理教育研究所」。使用繁體中文。</div>
+    </div>
+    <div class="grid">
+      <div class="model-card">
+        <strong>✅ 本教材已做到：</strong><br>
+        單一 HTML 檔<br>
+        圖片全部內嵌為 inline SVG<br>
+        離線可開啟<br>
+        指令複製按鈕<br>
+        從安裝到跑通的完整步驟
+      </div>
+      <div class="model-card">
+        <strong>💡 給老師的建議：</strong><br>
+        可修改模型名稱，換成課本上的圓面積例題，<br>
+        再發給學生練習，既學數學又認識本地 AI。
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  製作：國立清華大學數理教育研究所 教學示範教材 &nbsp;|&nbsp; 僅供教學使用 &nbsp;|&nbsp; 圖片皆為 HTML 內嵌，無外部連結
+</footer>
+
+<script>
+function show(id, el) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (el) el.classList.add('active');
+}
+function calcArea() {
+  const r = parseFloat(document.getElementById('radius').value);
+  if (isNaN(r)) {
+    document.getElementById('areaResult').textContent = '請輸入數字喔！';
+    return;
+  }
+  const area = 3.14 * r * r;
+  document.getElementById('areaResult').textContent = '面積 ≈ ' + area.toFixed(2) + ' 平方公分  (A = 3.14 × ' + r + ' × ' + r + ')';
+}
+function copyCmd(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const old = btn.textContent;
+    btn.textContent = '已複製！✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = old; btn.classList.remove('copied'); }, 1500);
+  }).catch(() => alert('複製失敗，請手動複製指令'));
+}
+</script>
+</body>
+</html>
